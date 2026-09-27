@@ -300,6 +300,9 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "820612874303",
   appId: "1:820612874303:web:5bb41faf4d4a418ad6b88a"
 };
+// Nombre de la base de datos de Firestore. Tu proyecto la creó como "default".
+// (Si algún día usas la base estándar de Firebase, cámbialo a "(default)".)
+const FIRESTORE_DB = "default";
 const APP_NAME = "La Gran Dox";
 const APP_TAGLINE = "Barbería · Instituto de formación técnico";
 const FIREBASE_VERSION = "10.12.2";
@@ -441,8 +444,8 @@ async function firebaseAdapter(cfg) {
   const app = appM.initializeApp(cfg);
   const auth = authM.getAuth(app);
   let db;
-  try { db = fs.initializeFirestore(app, { ignoreUndefinedProperties: true, localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() }) }); }
-  catch { db = fs.getFirestore(app); }
+  try { db = fs.initializeFirestore(app, { ignoreUndefinedProperties: true, experimentalAutoDetectLongPolling: true, localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() }) }, FIRESTORE_DB); }
+  catch (e) { console.warn(e); try { db = fs.initializeFirestore(app, { ignoreUndefinedProperties: true, experimentalAutoDetectLongPolling: true }, FIRESTORE_DB); } catch { db = fs.getFirestore(app, FIRESTORE_DB); } }
   const { doc, collection, getDoc, getDocs, setDoc, updateDoc, deleteDoc, writeBatch, onSnapshot, query, where } = fs;
   const col = (s, sub) => collection(db, 'shops', s, sub);
   const arr = snap => snap.docs.map(d => ({ id: d.id, ...d.data() }));
